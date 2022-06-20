@@ -2,7 +2,7 @@ package main
 
 import (
 	"image-converter/converter"
-	_ "net/http"
+	"image-converter/server"
 	"os"
 )
 
@@ -21,10 +21,17 @@ func main() {
 			secondArg = ""
 		}
 
-		err := converter.Convert(args[1], secondArg)
+		_, err := converter.Convert(args[1], secondArg)
 
 		if err != nil {
 			help(err)
+		}
+
+		// Handle
+		if len(args) > 3 {
+			if args[3] == "--open" {
+				server.ServeImages(secondArg)
+			}
 		}
 	}
 

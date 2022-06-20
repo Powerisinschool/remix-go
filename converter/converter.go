@@ -54,19 +54,19 @@ type Pixel struct {
 	A uint8
 }
 
-func Convert(path string, newPath string) error {
+func Convert(path string, newPath string) (image.Image, error) {
 	// Handle Errors
 
 	matchers := []string{"*.png", "*.jpeg", "*.webp", "*.gif"}
 	if !match.IsMatching(path, matchers) || !match.IsMatching(newPath, matchers) {
-		return errors.New("unsupported extension used")
+		return nil, errors.New("unsupported extension used")
 	}
 
 	mainFormatStr := strings.Split(path, ".")[len(strings.Split(path, "."))-1]
 	outFormatStr := strings.Split(newPath, ".")[len(strings.Split(newPath, "."))-1]
-	
+
 	if mainFormatStr == outFormatStr {
-		return errors.New("nothing to convert (same format)")
+		return nil, errors.New("nothing to convert (same format)")
 	}
 
 	// End Error Handlers
@@ -75,6 +75,8 @@ func Convert(path string, newPath string) error {
 		newPath = "out.gif"
 		fmt.Printf("No output file given\nDefaulted to " + newPath)
 	}
+
+	newPath = "dist/" + newPath
 
 	switch mainFormatStr {
 	case "png":
@@ -134,13 +136,13 @@ func Convert(path string, newPath string) error {
 	}
 	x := 0
 	fmt.Println("Converting...")
-	for i:=0; i<int(len(imgPixels)*len(imgPixels[0])); i++ {
-		indexY := int(i%len(imgPixels))
-		if (i%len(imgPixels) == 0) {
-			x++;
+	for i := 0; i < int(len(imgPixels)*len(imgPixels[0])); i++ {
+		indexY := int(i % len(imgPixels))
+		if i%len(imgPixels) == 0 {
+			x++
 			continue
 		}
-		pixel := imgPixels[indexY][x - 1]
+		pixel := imgPixels[indexY][x-1]
 		imagee.Set(x-1, int(i%len(imgPixels)), color.RGBA{pixel.R, pixel.G, pixel.B, pixel.A})
 	}
 	processedFile, _ := os.Create(newPath)
@@ -156,5 +158,5 @@ func Convert(path string, newPath string) error {
 		gif.Encode(processedFile, imagee, nil)
 	}
 
-	return nil
+	return imagee, nil
 }
