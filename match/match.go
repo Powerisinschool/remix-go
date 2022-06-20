@@ -47,3 +47,12 @@ func IsMatch(s string, p string) bool {
 
 	return isMatchingMatrix[lenInput][lenPattern]
 }
+
+func IsMatching(str string, matcher []string) bool {
+	for i := 0; i < len(matcher); i++ {
+		if IsMatch(str, matcher[i]) {
+			return true
+		}
+	}
+	return false
+}

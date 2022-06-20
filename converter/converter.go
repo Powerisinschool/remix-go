@@ -1,17 +1,21 @@
 package converter
 
 import (
+	"errors"
 	"fmt"
-	ewebp "github.com/chai2010/webp"
-	"golang.org/x/image/webp"
 	"image"
+	"image-converter/match"
 	"image/color"
+	"image/gif"
 	"image/jpeg"
 	"image/png"
-	"image/gif"
 	"io"
 	"log"
 	"os"
+	"strings"
+
+	ewebp "github.com/chai2010/webp"
+	"golang.org/x/image/webp"
 )
 
 // Get the bi-dimensional pixel array
@@ -50,14 +54,49 @@ type Pixel struct {
 	A uint8
 }
 
-func PNGToJPEG(path string, newFilename string) bool {
-	if newFilename == "" {
-		newFilename = "out.jpeg"
-		fmt.Printf("No output file given\nDefaulted to " + newFilename)
+func Convert(path string, newPath string) error {
+	// Handle Errors
+
+	matchers := []string{"*.png", "*.jpeg", "*.webp", "*.gif"}
+	if !match.IsMatching(path, matchers) || !match.IsMatching(newPath, matchers) {
+		return errors.New("unsupported extension used")
 	}
 
-	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
-	image.RegisterFormat("jpeg", "jpeg", jpeg.Decode, jpeg.DecodeConfig)
+	mainFormatStr := strings.Split(path, ".")[len(strings.Split(path, "."))-1]
+	outFormatStr := strings.Split(newPath, ".")[len(strings.Split(newPath, "."))-1]
+	
+	if mainFormatStr == outFormatStr {
+		return errors.New("nothing to convert (same format)")
+	}
+
+	// End Error Handlers
+
+	if newPath == "" {
+		newPath = "out.gif"
+		fmt.Printf("No output file given\nDefaulted to " + newPath)
+	}
+
+	switch mainFormatStr {
+	case "png":
+		image.RegisterFormat(mainFormatStr, mainFormatStr, png.Decode, png.DecodeConfig)
+	case "jpeg":
+		image.RegisterFormat(mainFormatStr, mainFormatStr, jpeg.Decode, jpeg.DecodeConfig)
+	case "webp":
+		image.RegisterFormat(mainFormatStr, mainFormatStr, webp.Decode, webp.DecodeConfig)
+	case "gif":
+		image.RegisterFormat(mainFormatStr, mainFormatStr, gif.Decode, gif.DecodeConfig)
+	}
+
+	switch outFormatStr {
+	case "png":
+		image.RegisterFormat(mainFormatStr, mainFormatStr, png.Decode, png.DecodeConfig)
+	case "jpeg":
+		image.RegisterFormat(mainFormatStr, mainFormatStr, jpeg.Decode, jpeg.DecodeConfig)
+	case "webp":
+		image.RegisterFormat(mainFormatStr, mainFormatStr, ewebp.Decode, ewebp.DecodeConfig)
+	case "gif":
+		image.RegisterFormat(mainFormatStr, mainFormatStr, gif.Decode, gif.DecodeConfig)
+	}
 
 	file, err := os.Open(path)
 	if err != nil {
@@ -68,14 +107,13 @@ func PNGToJPEG(path string, newFilename string) bool {
 
 	img, _, err := image.Decode(file)
 
-	defer fmt.Println("Converted " + path + " to " + newFilename)
+	defer fmt.Println("Converted " + path + " to " + newPath)
 
 	if err != nil {
 		log.Panic(err.Error())
 	}
 
 	bounds := img.Bounds()
-	fmt.Println(bounds)
 
 	filer, err := os.Open(path)
 
@@ -94,9 +132,8 @@ func PNGToJPEG(path string, newFilename string) bool {
 	if err != nil {
 		log.Panic(err.Error())
 	}
-	fmt.Println(len(imgPixels))
 	x := 0
-	fmt.Println("Compiling...")
+	fmt.Println("Converting...")
 	for i:=0; i<int(len(imgPixels)*len(imgPixels[0])); i++ {
 		indexY := int(i%len(imgPixels))
 		if (i%len(imgPixels) == 0) {
@@ -106,135 +143,18 @@ func PNGToJPEG(path string, newFilename string) bool {
 		pixel := imgPixels[indexY][x - 1]
 		imagee.Set(x-1, int(i%len(imgPixels)), color.RGBA{pixel.R, pixel.G, pixel.B, pixel.A})
 	}
-	processedFile, _ := os.Create(newFilename)
+	processedFile, _ := os.Create(newPath)
 	defer processedFile.Close()
-	jpeg.Encode(processedFile, imagee, nil)
-
-	return true
-}
-
-func PNGToGIF(path string, newFilename string) bool {
-	if newFilename == "" {
-		newFilename = "out.gif"
-		fmt.Printf("No output file given\nDefaulted to " + newFilename)
+	switch outFormatStr {
+	case "png":
+		png.Encode(processedFile, imagee)
+	case "jpeg":
+		jpeg.Encode(processedFile, imagee, &jpeg.Options{Quality: 100})
+	case "webp":
+		ewebp.Encode(processedFile, imagee, &ewebp.Options{Lossless: true})
+	case "gif":
+		gif.Encode(processedFile, imagee, nil)
 	}
 
-	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
-	image.RegisterFormat("gif", "gif", gif.Decode, gif.DecodeConfig)
-
-	file, err := os.Open(path)
-	if err != nil {
-		log.Panic(err.Error())
-	}
-
-	defer file.Close()
-
-	img, _, err := image.Decode(file)
-
-	defer fmt.Println("Converted " + path + " to " + newFilename)
-
-	if err != nil {
-		log.Panic(err.Error())
-	}
-
-	bounds := img.Bounds()
-	fmt.Println(bounds)
-
-	filer, err := os.Open(path)
-
-	if err != nil {
-		log.Panic(err)
-	}
-
-	defer filer.Close()
-
-	imgPixels, err := getPixels(filer)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	imagee := image.NewRGBA(image.Rect(bounds.Min.X, bounds.Min.Y, bounds.Max.X, bounds.Max.Y))
-	if err != nil {
-		log.Panic(err.Error())
-	}
-	fmt.Println(len(imgPixels))
-	x := 0
-	fmt.Println("Compiling...")
-	for i:=0; i<int(len(imgPixels)*len(imgPixels[0])); i++ {
-		indexY := int(i%len(imgPixels))
-		if (i%len(imgPixels) == 0) {
-			x++;
-			continue
-		}
-		pixel := imgPixels[indexY][x - 1]
-		imagee.Set(x-1, int(i%len(imgPixels)), color.RGBA{pixel.R, pixel.G, pixel.B, pixel.A})
-	}
-	processedFile, _ := os.Create(newFilename)
-	defer processedFile.Close()
-	gif.Encode(processedFile, imagee, nil)
-
-	return true
-}
-
-func PNGToWEBP(path string, newFilename string) bool {
-	if newFilename == "" {
-		newFilename = "out.webp"
-		fmt.Printf("No output file given\nDefaulted to " + newFilename)
-	}
-
-	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
-	image.RegisterFormat("webp", "webp", webp.Decode, webp.DecodeConfig)
-
-	file, err := os.Open(path)
-	if err != nil {
-		log.Panic(err.Error())
-	}
-
-	defer file.Close()
-
-	img, _, err := image.Decode(file)
-
-	defer fmt.Println("Converted " + path + " to " + newFilename)
-
-	if err != nil {
-		log.Panic(err.Error())
-	}
-
-	bounds := img.Bounds()
-	fmt.Println(bounds)
-
-	filer, err := os.Open(path)
-
-	if err != nil {
-		log.Panic(err)
-	}
-
-	defer filer.Close()
-
-	imgPixels, err := getPixels(filer)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	imagee := image.NewRGBA(image.Rect(bounds.Min.X, bounds.Min.Y, bounds.Max.X, bounds.Max.Y))
-	if err != nil {
-		log.Panic(err.Error())
-	}
-	fmt.Println(len(imgPixels))
-	x := 0
-	fmt.Println("Compiling...")
-	for i:=0; i<int(len(imgPixels)*len(imgPixels[0])); i++ {
-		indexY := int(i%len(imgPixels))
-		if (i%len(imgPixels) == 0) {
-			x++;
-			continue
-		}
-		pixel := imgPixels[indexY][x - 1]
-		imagee.Set(x-1, int(i%len(imgPixels)), color.RGBA{pixel.R, pixel.G, pixel.B, pixel.A})
-	}
-	processedFile, _ := os.Create(newFilename)
-	defer processedFile.Close()
-	ewebp.Encode(processedFile, imagee, &ewebp.Options{Lossless: true})
-
-	return true
+	return nil
 }

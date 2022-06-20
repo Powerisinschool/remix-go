@@ -2,28 +2,36 @@ package main
 
 import (
 	// "fmt"
-	// "image-converter/converter"
-	"image-converter/match"
+	"image-converter/converter"
+	// "image-converter/match"
 	_ "net/http"
 	"os"
 )
 
-// &copy; 2022 Tolulope Olagunju
+// © 2022 Tolulope Olagunju
 
 func main() {
 	args := os.Args
-
-	// secondArg := false
 
 	if len(args) < 2 {
 		panic("Not yet supported\nInput at least 1 argument")
 	}
 
 	if len(args) > 2 {
-		if match.IsMatch(args[1], "*.png") {
-			panic("Good")
-		} else {
-			help()
+		secondArg := args[2]
+		if secondArg == "x" {
+			secondArg = ""
+		}
+		// if match.IsMatch(args[1], "*.png") {
+		// 	Convert()
+		// } else {
+		// 	help()
+		// }
+
+		err := converter.Convert(args[1], secondArg)
+
+		if err != nil {
+			help(err)
 		}
 	}
 
@@ -54,6 +62,6 @@ func main() {
 	// }
 }
 
-func help() {
-	panic("unimplemented")
+func help(err error) {
+	panic(err.Error())
 }
