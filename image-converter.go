@@ -2,6 +2,7 @@ package main
 
 import (
 	"image-converter/converter"
+	"github.com/Powerisinschool/pxl"
 	"image-converter/server"
 	"os"
 )
@@ -30,7 +31,12 @@ func main() {
 		// Handle
 		if len(args) > 3 {
 			if args[3] == "--open" {
+				pxl.Render([]string{secondArg})
+				panic("functionality is broken for now!")
+			} else if args[3] == "--open-server" {
 				server.ServeImages(secondArg)
+			} else {
+				panic("Invalid args")
 			}
 		}
 	}
