@@ -4,6 +4,7 @@ import (
 	"image-converter/converter"
 	"github.com/Powerisinschool/pxl"
 	"image-converter/server"
+	"image-converter/match"
 	"os"
 )
 
@@ -29,11 +30,23 @@ func main() {
 		}
 
 		// Handle
-		if len(args) > 3 {
-			if args[3] == "--open" {
+		if len(args) > 2 {
+			consider := "";
+			openers := []string{"--open", "--open-server"}
+
+			if match.IsMatching(args[2], openers) {
+				secondArg = "out.webp"
+			}
+			
+			if (len(args) > 3) {
+				consider = args[3]
+			} else {
+				consider = args[2]
+			}
+			if consider == "--open" {
 				pxl.Render([]string{secondArg})
 				panic("functionality is broken for now!")
-			} else if args[3] == "--open-server" {
+			} else if consider == "--open-server" {
 				server.ServeImages(secondArg)
 			} else {
 				panic("Invalid args")

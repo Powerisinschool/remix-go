@@ -56,10 +56,21 @@ type Pixel struct {
 
 func Convert(path string, newPath string) (image.Image, error) {
 	// Handle Errors
+	openers := []string{"--open", "--open-server"}
+	if match.IsMatching(newPath, openers) {
+		newPath = ""
+	}
 
 	matchers := []string{"*.png", "*.jpeg", "*.webp", "*.gif"}
-	if !match.IsMatching(path, matchers) || !match.IsMatching(newPath, matchers) {
+	if (!match.IsMatching(path, matchers) || !match.IsMatching(newPath, matchers)) && newPath != "" {
 		return nil, errors.New("unsupported extension used")
+	}
+
+	// End Error Handlers
+
+	if newPath == "" {
+		newPath = "out.webp"
+		fmt.Printf("\nNo output file specified\nDefaulted to " + newPath + "\n\n")
 	}
 
 	mainFormatStr := strings.Split(path, ".")[len(strings.Split(path, "."))-1]
@@ -67,13 +78,6 @@ func Convert(path string, newPath string) (image.Image, error) {
 
 	if mainFormatStr == outFormatStr {
 		return nil, errors.New("nothing to convert (same format)")
-	}
-
-	// End Error Handlers
-
-	if newPath == "" {
-		newPath = "out.gif"
-		fmt.Printf("No output file given\nDefaulted to " + newPath)
 	}
 
 	newPath = "dist/" + newPath
