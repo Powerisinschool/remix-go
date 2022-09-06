@@ -6,3 +6,5 @@
 * old.txt
 *.exe
 image-converter
+images
+install.sh

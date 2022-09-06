@@ -18,6 +18,8 @@ import (
 	"golang.org/x/image/webp"
 )
 
+var matchers = []string{"*.png", "*.jpeg", "*.webp", "*.gif"}
+
 // Get the bi-dimensional pixel array
 func getPixels(file io.Reader) ([][]Pixel, error) {
 	img, _, err := image.Decode(file)
@@ -80,7 +82,9 @@ func Convert(path string, newPath string) (image.Image, error) {
 		return nil, errors.New("nothing to convert (same format)")
 	}
 
-	newPath = "dist/" + newPath
+	if newPath == "" {
+		newPath = "dist/" + newPath
+	}
 
 	switch mainFormatStr {
 	case "png":
@@ -163,4 +167,24 @@ func Convert(path string, newPath string) (image.Image, error) {
 	}
 
 	return imagee, nil
+}
+
+func ConvertDir(sDir, xDir, outputFormat string) error {
+	files, err := os.ReadDir(sDir)
+	if err != nil {
+		return err
+	}
+
+	for _, f := range files {
+		file := f.Name()
+		fmt.Println("Converting", file)
+		filer := strings.Join(strings.Split(file, ".")[0:len(strings.Split(file, "."))-1], ".")
+		if match.IsMatching(file, matchers) {
+			_, err = Convert(sDir+file, strings.Join([]string{xDir + filer, outputFormat}, "."))
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }

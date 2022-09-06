@@ -1,0 +1,33 @@
+
+
+Tue Sep  6 12:17:55 2022
+Command line: TestDisk
+
+TestDisk 7.1, Data Recovery Utility, July 2019
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Linux, kernel 5.10.120-16471-g167ad2e5dcba (#1 SMP PREEMPT Sun Aug 14 18:22:09 PDT 2022) x86_64
+Compiler: GCC 9.2
+ext2fs lib: 1.46.2, ntfs lib: libntfs-3g, reiserfs lib: none, ewf lib: none, curses lib: ncurses 6.1
+User is not root!
+Hard disk list
+
+
+TestDisk exited normally.
+Using locale 'en_US.UTF-8'.
+
+
+Tue Sep  6 12:17:55 2022
+Command line: TestDisk /debug
+
+TestDisk 7.1, Data Recovery Utility, July 2019
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Linux, kernel 5.10.120-16471-g167ad2e5dcba (#1 SMP PREEMPT Sun Aug 14 18:22:09 PDT 2022) x86_64
+Compiler: GCC 9.2
+ext2fs lib: 1.46.2, ntfs lib: libntfs-3g, reiserfs lib: none, ewf lib: none, curses lib: ncurses 6.1
+Hard disk list
+
+No disk found
+
+TestDisk exited normally.
