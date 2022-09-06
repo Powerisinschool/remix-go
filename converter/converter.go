@@ -180,6 +180,10 @@ func ConvertDir(sDir, xDir, outputFormat string) error {
 		fmt.Println("Converting", file)
 		filer := strings.Join(strings.Split(file, ".")[0:len(strings.Split(file, "."))-1], ".")
 		if match.IsMatching(file, matchers) {
+			if match.IsMatch(file, "*."+outputFormat) {
+				fmt.Println("Skipping file as it is already converted")
+				continue
+			}
 			_, err = Convert(sDir+file, strings.Join([]string{xDir + filer, outputFormat}, "."))
 			if err != nil {
 				return err
