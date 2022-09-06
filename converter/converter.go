@@ -143,7 +143,7 @@ func Convert(path string, newPath string) (image.Image, error) {
 		log.Panic(err.Error())
 	}
 	x := 0
-	fmt.Println("Converting...")
+	fmt.Printf("Converting ...\r")
 	for i := 0; i < int(len(imgPixels)*len(imgPixels[0])); i++ {
 		indexY := int(i % len(imgPixels))
 		if i%len(imgPixels) == 0 {
