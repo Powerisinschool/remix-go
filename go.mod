@@ -1,4 +1,4 @@
-module image-converter
+module remix
 
 go 1.18
 
