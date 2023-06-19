@@ -4,7 +4,7 @@
 <code>image-converter [format1] [format2] [--arg]</code>
 
 ## Example Use:
-Assuming a file is existent in the current directory called image.jpg.
+- Assuming a file is existent in the current directory called image.jpg.
 To convert image.jpg to WebP format, run:
 <br>
 <code>image-converter image.jpg image.webp</code>
