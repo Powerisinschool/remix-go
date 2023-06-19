@@ -3,12 +3,10 @@ package main
 import (
 	"errors"
 	"fmt"
-	"image-converter/converter"
-
-	// "github.com/Powerisinschool/pxl"
-	"image-converter/match"
-	"image-converter/server"
 	"os"
+	"remix/converter"
+	"remix/match"
+	"remix/server"
 )
 
 // © 2022 Tolulope Olagunju
