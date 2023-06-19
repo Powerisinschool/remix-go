@@ -1,4 +1,4 @@
 #!/bin/bash
 go build .
-sudo mv ./image-converter /usr/bin/imgconvert
-echo "Version $(imgconvert --version) successfully installed"
+sudo mv ./remix /usr/bin/remix
+echo "Version $(remix --version) successfully installed"
