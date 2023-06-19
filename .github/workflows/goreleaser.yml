@@ -20,6 +20,11 @@ jobs:
         name: Set up Go
         uses: actions/setup-go@v4
       -
+        name: Install webp on Linux
+        run: |
+          sudo apt update
+          sudo apt-get install -y libwebp-dev
+      -
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4.3.0
         with:

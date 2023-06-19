@@ -14,8 +14,10 @@ import (
 	"remix/match"
 	"strings"
 
-	ewebp "github.com/chai2010/webp"
-	"golang.org/x/image/webp"
+	// ewebp "github.com/chai2010/webp"
+	"github.com/kolesa-team/go-webp/encoder"
+	"github.com/kolesa-team/go-webp/webp"
+	gwebp "golang.org/x/image/webp"
 )
 
 var matchers = []string{"*.png", "*.jpeg", "*.webp", "*.gif"}
@@ -92,7 +94,7 @@ func Convert(path string, newPath string) (image.Image, error) {
 	case "jpeg":
 		image.RegisterFormat(mainFormatStr, mainFormatStr, jpeg.Decode, jpeg.DecodeConfig)
 	case "webp":
-		image.RegisterFormat(mainFormatStr, mainFormatStr, webp.Decode, webp.DecodeConfig)
+		image.RegisterFormat(mainFormatStr, mainFormatStr, gwebp.Decode, gwebp.DecodeConfig)
 	case "gif":
 		image.RegisterFormat(mainFormatStr, mainFormatStr, gif.Decode, gif.DecodeConfig)
 	}
@@ -103,7 +105,7 @@ func Convert(path string, newPath string) (image.Image, error) {
 	case "jpeg":
 		image.RegisterFormat(mainFormatStr, mainFormatStr, jpeg.Decode, jpeg.DecodeConfig)
 	case "webp":
-		image.RegisterFormat(mainFormatStr, mainFormatStr, ewebp.Decode, ewebp.DecodeConfig)
+		image.RegisterFormat(mainFormatStr, mainFormatStr, gwebp.Decode, gwebp.DecodeConfig)
 	case "gif":
 		image.RegisterFormat(mainFormatStr, mainFormatStr, gif.Decode, gif.DecodeConfig)
 	}
@@ -161,7 +163,11 @@ func Convert(path string, newPath string) (image.Image, error) {
 	case "jpeg":
 		jpeg.Encode(processedFile, imagee, &jpeg.Options{Quality: 100})
 	case "webp":
-		ewebp.Encode(processedFile, imagee, &ewebp.Options{Lossless: true})
+		options, err := encoder.NewLossyEncoderOptions(encoder.PresetDefault, 75)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		webp.Encode(processedFile, imagee, options)
 	case "gif":
 		gif.Encode(processedFile, imagee, nil)
 	}
