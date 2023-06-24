@@ -1,14 +1,14 @@
 # Remix - Image Converter built with go
 
 ## Usage:
-```shell
+```bash
 remix [format1] [format2] [--args]
 ```
 
 ## Build & Installation:
 Run the following in your terminal
 
-```shell
+```bash
 # Clone the repository
 git clone https://github.com/Powerisinschool/remix-go.git
 cd remix-go
@@ -25,12 +25,12 @@ Assuming a file is existent in the current directory called image.jpg.
 
 To convert image.jpg to WebP format, run:
 
-```shell
+```bash
 remix image.jpg image.webp
 ```
 
 To open the new file after conversion, pass the --open argument when running the program like:
 
-```shell
+```bash
 remix image.jpg image.webp --open
 ```
